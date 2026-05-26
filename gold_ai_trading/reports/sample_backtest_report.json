@@ -1,0 +1,7 @@
+{
+  "schema_note": "Minimal shape produced by GoldBacktraderEngine after JSON serialization of analyzers.",
+  "final_value": 100000.0,
+  "sharpe_ratio": null,
+  "max_drawdown_pct": null,
+  "trade_stats": "Run `python main.py validate_bt` to populate brokersim metrics for your environment."
+}

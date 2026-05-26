@@ -1,0 +1,15 @@
+strategy_id: example_ema_ml
+description: >-
+  Example strategy blending EMA trend filter with ML directional confidence.
+  Tune parameters in Backtrader and VectorBT pipelines separately.
+
+signals:
+  use_ml: true
+  ml_probability_long: 0.52   # classify long when P(up) >= this
+  ml_probability_short: 0.52
+  ml_model_path: models/latest_ensemble.pkl
+  trend_filter:
+    enabled: true
+    fast_ema_col: ema_fast
+    slow_ema_col: ema_slow
+  atr_filter_quantile: 0.05  # skip bottom 5% volatility bars (thin market proxy)

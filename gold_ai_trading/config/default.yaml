@@ -1,0 +1,120 @@
+# Default runtime configuration — override paths per environment via env vars or CLI.
+
+project:
+  name: gold_ai_trading
+  timezone: UTC
+  seed: 42
+
+paths:
+  data_dir: ./data
+  models_dir: ./models
+  reports_dir: ./reports
+  logs_dir: ./logs
+
+logging:
+  level: INFO  # DEBUG | INFO | WARNING | ERROR
+  file: logs/gold_ai.log
+
+data:
+  # Symbols: Yahoo tickers — GC=F (~COMEX gold), GLD (ETF), INR=X optional for INR conversion
+  default_symbol: GC=F
+  symbols:
+    xauusd_proxy: GC=F
+    gld_etf: GLD
+    mcx_gold:
+      ticker: GOLD23.NS  # placeholder equity proxy; MCX commodity requires broker feed
+      note: Override with MCX futures symbol from your data provider API.
+  timeframe: 1h
+  resample_targets: ["15m", "1h", "4h", "1d"]
+  start_date: "2018-01-01"
+  end_date: null  # null = latest
+  cache_format: parquet
+
+indicators:
+  rsi_length: 14
+  macd_fast: 12
+  macd_slow: 26
+  macd_signal: 9
+  ema_fast: 21
+  ema_slow: 55
+  bb_length: 20
+  bb_std: 2
+  atr_length: 14
+  supertrend_length: 10
+  supertrend_multiplier: 3.0
+
+feature_engineering:
+  return_horizons: [1, 3, 5, 10]
+  lag_features: [1, 2, 3, 5]
+  volatility_window: 20
+  momentum_windows: [5, 10, 20]
+
+vectorbt:
+  fees: 0.00035  # ~0.035% commission as fraction per trade side (approximate)
+  slippage_pct: 0.0001
+  freq: 1h
+  warmup_bars: 100
+
+risk:
+  max_position_pct_nav: 0.25
+  max_daily_loss_pct: 0.02
+  atr_stop_multiplier: 2.0
+  take_profit_rr: 1.8
+  use_trailing: true
+  trailing_pct: 0.015
+
+ml:
+  target_mode: classification  # classification | regression
+  classification_threshold: 0.0  # predict up if fwd return > this
+  label_mode: triple_barrier  # forward_return | triple_barrier
+  forward_horizon: 1  # bars ahead for label
+  triple_barrier:
+    tp_atr_mult: 1.5
+    sl_atr_mult: 1.0
+    min_abs_ret: 0.0
+  train_test_pct: 0.8
+  walk_forward_splits: 5
+  purge_gap_bars: 5  # avoid leakage across split boundary
+  regime_models:
+    enabled: true
+    feature_col: vol_regime
+  models:
+    - xgboost
+    - lightgbm
+    - random_forest
+  tuning:
+    n_iter: 24
+    cv_splits: 3
+  lstm:
+    seq_len: 32
+    epochs: 20
+    batch_size: 64
+
+backtrader:
+  commission: 0.00035
+  slippage_perc: 0.001
+  confidence_edge: 0.02
+  initial_cash: 100000.0
+  margin: 1.0
+  cheat_on_open: false
+  broker_leverage_for_futures: 10
+
+walk_forward:
+  train_months: 18
+  test_months: 3
+
+monte_carlo:
+  simulations: 1000
+
+artifacts:
+  ml_model_joblib: ./models/stacked_ensemble.joblib
+
+regime_detection:
+  vol_window: 63
+  high_vol_quantile: 0.66
+
+economic_calendar:
+  enabled: false
+  blackout_minutes_before: 30
+  blackout_minutes_after: 60
+  # Integrate Investing.com / Fusion / broker calendar API paths here later

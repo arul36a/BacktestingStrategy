@@ -1,0 +1,6 @@
+{
+  "final_value": 100000.0,
+  "sharpe_ratio": null,
+  "max_drawdown_pct": 0.0,
+  "trade_stats": "AutoOrderedDict({'total': AutoOrderedDict({'total': 0})})"
+}
